@@ -9,6 +9,7 @@ send email with the team report
 """
 import logging
 from datetime import  datetime
+from CheckmarxPythonSDK.CxRestAPISDK import ScansAPI
 from CheckmarxPythonSDK.configUtility import get_config_info_from_config_json_file
 from Service.CxReportingService import (
     get_multiple_team_report_file_path,
@@ -43,7 +44,7 @@ if __name__ == '__main__':
         section="CxConsolidatedReports",
         option_list=[
             "reports_folder", "report_rotation_days", "log_folder", "log_rotation_days",
-            "team_mapping"
+            "recursive_level", "team_mapping"
         ]
     )
 
@@ -70,7 +71,9 @@ if __name__ == '__main__':
                 report_folder=cx_consolidated_report_config.get("reports_folder"),
             )
         else:
-            team_with_descendants = get_team_with_descendants(team_full_name)
+            team_with_descendants = get_team_with_descendants(
+                team_full_name, recursive_level=cx_consolidated_report_config.get("recursive_level")
+            )
             team_full_name_list = [team.full_name for team in team_with_descendants]
             file_path = get_multiple_team_report_file_path(
                 team_full_name_list=team_full_name_list,
