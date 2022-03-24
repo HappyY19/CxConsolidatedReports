@@ -21,28 +21,36 @@ def get_team_by_full_name(team_full_name):
     return team_list[0]
 
 
-def get_descendant_teams_by_parent_id(parent_id):
+def get_child_teams_by_parent_team(parent_teams):
     """
 
     Args:
-        parent_id (int):
+        parent_teams (list[CxTeam]):
 
     Returns:
         list[CxTeam]
     """
-    if not isinstance(parent_id, int):
-        raise ValueError("parameter parent_id type should be int")
-    teams = [team for team in all_teams if team.parent_id == parent_id]
-    for team in teams:
-        teams.extend(get_descendant_teams_by_parent_id(parent_id=team.team_id))
-    return teams
+    parent_team_list = parent_teams.copy()
+
+    def get_descendants():
+        nonlocal parent_team_list
+        descendant_teams = []
+        for team in all_teams:
+            for member in parent_team_list:
+                if team.parent_id == member.team_id:
+                    descendant_teams.append(team)
+        parent_team_list = descendant_teams
+        return descendant_teams
+
+    return get_descendants
 
 
-def get_team_with_descendants(team_full_name):
+def get_team_with_descendants(team_full_name, recursive_level=3):
     """
 
     Args:
         team_full_name (str):
+        recursive_level (int):
 
     Returns:
         list[CxTeam]
@@ -52,6 +60,11 @@ def get_team_with_descendants(team_full_name):
     if not team:
         return []
 
-    child_teams = get_descendant_teams_by_parent_id(parent_id=team.team_id)
-    child_teams.append(team)
-    return child_teams
+    teams = [team]
+
+    get_child_teams_func = get_child_teams_by_parent_team(teams)
+    while recursive_level > 1:
+        teams.extend(get_child_teams_func())
+        recursive_level -= 1
+
+    return teams
