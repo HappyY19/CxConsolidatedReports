@@ -18,8 +18,24 @@ from Service.CxReportingService import (
 
 from Service.SmtpService import send_mail
 from Service.CxSastService import (get_team_by_full_name, get_team_with_descendants)
+from Service.LoggingService import set_logger
 
-logger = logging.getLogger(__name__)
+cx_consolidated_report_config = get_config_info_from_config_json_file(
+        section="CxConsolidatedReports",
+        option_list=[
+            "reports_folder", "report_rotation_days", "log_level", "log_folder", "log_rotation_days",
+            "recursive_level", "team_mapping"
+        ]
+    )
+
+set_logger(
+    level=logging.DEBUG,
+    log_folder=cx_consolidated_report_config.get("log_folder"),
+    when="M",
+    backup_count=cx_consolidated_report_config.get("log_rotation_days")
+)
+
+logger = logging.getLogger("CxConsolidatedReports")
 
 
 if __name__ == '__main__':
@@ -40,21 +56,14 @@ if __name__ == '__main__':
         ]
     )
 
-    cx_consolidated_report_config = get_config_info_from_config_json_file(
-        section="CxConsolidatedReports",
-        option_list=[
-            "reports_folder", "report_rotation_days", "log_folder", "log_rotation_days",
-            "recursive_level", "team_mapping"
-        ]
-    )
 
     team_mapping_list = cx_consolidated_report_config.get("team_mapping")
-
+    logger.info("Finished get config data")
     for team_mapping in team_mapping_list:
         team_full_name = team_mapping.get("team_full_name")
         search_team_recursive = team_mapping.get("search_team_recursive")
         email_list = team_mapping.get("emails")
-
+        logger.info("team full name: {}, search_team_recursive: {}".format(team_full_name, search_team_recursive))
         team = get_team_by_full_name(team_full_name)
         if not team:
             logger.info("team with team_full_name: {} not found, skip this team".format(team_full_name))
