@@ -1,1 +1,4 @@
 CheckmarxPythonSDK==0.5.1
+certifi==2021.10.8
+incremental==21.3.0
+pyinstaller==4.10
