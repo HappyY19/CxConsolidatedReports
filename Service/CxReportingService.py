@@ -19,7 +19,10 @@ def create_report_and_get_report_file_path(template_id, entity_id, report_name, 
         return ""
 
     if not report_folder or not exists(report_folder):
-        report_folder = os.getcwd()
+        curent_working_dir = os.getcwd()
+        report_folder = normpath(join(curent_working_dir, "consolidated_reports"))
+        if not exists(report_folder):
+            os.mkdir(report_folder)
     file_name = normpath(join(report_folder, report_name + "." + output_format))
     with open(str(file_name), "wb") as f_out:
         f_out.write(report_content)
