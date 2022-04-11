@@ -85,12 +85,12 @@ if __name__ == '__main__':
             send_mail(
                 send_from=smtp_config.get("send_from_address"),
                 send_to=email_list,
-                subject="CxConsolidatedReport",
-                message="Hello, Someone There",
+                subject=cx_consolidated_report_config.get("subject", "CxSAST Consolidated Report"),
+                message=cx_consolidated_report_config.get("message", "Please find attached the consolidated CxSAST report."),
                 files=[file_path],
                 server=smtp_config.get("smtp_server"),
                 port=smtp_config.get("port"),
                 username=smtp_config.get("username"),
                 password=smtp_config.get("password"),
-                use_tls=False,
+                use_tls=smtp_config.get("use_tls", True),
             )
