@@ -8,14 +8,12 @@ get team report by using CxReporting service api
 send email with the team report
 """
 import logging
-from datetime import  datetime
-from CheckmarxPythonSDK.CxRestAPISDK import ScansAPI
-from CheckmarxPythonSDK.configUtility import get_config_info_from_config_json_file
+from datetime import datetime
+from CheckmarxPythonSDK.configUtility import get_config, get_config_info_from_config_json_file
 from Service.CxReportingService import (
     get_multiple_team_report_file_path,
     get_single_team_report_file_path,
 )
-
 from Service.SmtpService import send_mail
 from Service.CxSastService import (get_team_by_full_name, get_team_with_descendants)
 from Service.LoggingService import set_logger
@@ -40,22 +38,30 @@ logger = logging.getLogger("CxConsolidatedReports")
 
 if __name__ == '__main__':
 
-    cx_reporting_config = get_config_info_from_config_json_file(
-        section="CxReporting",
-        option_list=[
-            "base_url", "reporting_client_url", "username", "password",
-            "grant_type", "scope", "client_id", "client_secret"
-        ]
-    )
-                                                                                      
-    smtp_config = get_config_info_from_config_json_file(
-        section="SMTP",
-        option_list=[
-            "smtp_server", "port", "send_from_address",
-            "send_from_display_name", "use_default_credentials", "username", "password"
-        ]
-    )
+    CxReporting = {
+        "base_url": "***",
+        "reporting_client_url": "***",
+        "username": "***",
+        "password": "***",
+        "grant_type": "password",
+        "scope": "reporting_api",
+        "client_id": "reporting_service_api",
+        "client_secret": "014DF517-39D1-4453-B7B3-9930C563627C"
+    }
 
+    SMTP = {
+        "smtp_server": "***",
+        "port": 25,
+        "send_from_address": "***",
+        "send_from_display_name": "CxConsolidatedReportNoReply",
+        "use_default_credentials": False,
+        "username": "***",
+        "password": "***",
+        "use_tls": False
+    }
+
+    cx_reporting_config = get_config(config_default=CxReporting, section="CxReporting", prefix="cxreporting_")
+    smtp_config = get_config(config_default=SMTP, section="SMTP", prefix="smtp_")
 
     team_mapping_list = cx_consolidated_report_config.get("team_mapping")
     logger.info("Finished get config data")
@@ -95,7 +101,8 @@ if __name__ == '__main__':
                 send_from=smtp_config.get("send_from_address"),
                 send_to=email_list,
                 subject=cx_consolidated_report_config.get("subject", "CxSAST Consolidated Report"),
-                message=cx_consolidated_report_config.get("message", "Please find attached the consolidated CxSAST report."),
+                message=cx_consolidated_report_config.get("message",
+                                                          "Please find attached the consolidated CxSAST report."),
                 files=[file_path],
                 server=smtp_config.get("smtp_server"),
                 port=smtp_config.get("port"),
