@@ -2,4 +2,4 @@
 
 ## pyinstaller
 
-pyinstaller -F  .\run.py
+pyinstaller -F  src\run.py
