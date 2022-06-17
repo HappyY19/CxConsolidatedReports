@@ -9,7 +9,17 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=[
+    'win32ctypes.core.ctypes',
+    'win32ctypes.core.ctypes._common',
+    'win32ctypes.core.ctypes._dll',
+    'win32ctypes.core.ctypes._resource',
+    'win32ctypes.core.ctypes._system_information',
+    'win32ctypes.core.ctypes._time',
+    'win32ctypes.core.ctypes._authentication',
+    'win32ctypes.pywin32.pywintypes',
+    'win32ctypes.pywin32.win32cred'
+    ],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
